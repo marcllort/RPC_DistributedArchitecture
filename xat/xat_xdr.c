@@ -8,6 +8,7 @@
 bool_t
 xdr_Message (XDR *xdrs, Message *objp)
 {
+
 	 if (!xdr_string (xdrs, &objp->data, ~0))
 		 return FALSE;
 	 if (!xdr_string (xdrs, &objp->user, ~0))
@@ -18,6 +19,7 @@ xdr_Message (XDR *xdrs, Message *objp)
 bool_t
 xdr_Xat (XDR *xdrs, Xat *objp)
 {
+
 	 if (!xdr_array (xdrs, (char **)&objp->Xat_val, (u_int *) &objp->Xat_len, ~0,
 		sizeof (Message), (xdrproc_t) xdr_Message))
 		 return FALSE;

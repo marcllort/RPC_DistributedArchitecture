@@ -7,8 +7,6 @@
 #define _XAT_H_RPCGEN
 
 #include <rpc/rpc.h>
-#include <stdio.h>
-#include <string.h>
 
 
 #ifdef __cplusplus
