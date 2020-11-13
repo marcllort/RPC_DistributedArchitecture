@@ -5,33 +5,29 @@
  */
 
 #include "xat.h"
+#include <string.h>
+
 
 int *
-writemsg_1(argp, rqstp)
-	Message *argp;
-	struct svc_req *rqstp;
+writemsg_1_svc(Message *argp, struct svc_req *rqstp)
 {
-
 	static int  result;
 
 	FILE * f = fopen("xat.txt", "a");
 
 	fprintf(f, "%s : %s\n", argp->user, argp->data);
+			printf("MESSAGE RECEIVED --- %s : %s\n", argp->user, argp->data);
 
 	fclose(f);
 
-	return(&result);
+	return &result;
 }
 
 Xat *
-getchat_1(argp, rqstp)
-	int *argp;
-	struct svc_req *rqstp;
+getchat_1_svc(int *argp, struct svc_req *rqstp)
 {
-
 	static Xat  result;
 
-	Message aux;
 	FILE * f = fopen("xat.txt", "r");
 	if (f != NULL) {
 
@@ -40,23 +36,22 @@ getchat_1(argp, rqstp)
 		result.Xat_val[result.Xat_len].data = (char *) malloc (sizeof(char) * 200);
 		fgets(result.Xat_val[result.Xat_len].data, 200, f);
 		result.Xat_val[result.Xat_len].data[strlen(result.Xat_val[result.Xat_len].data) - 1] = '\0';
-		result.Xat_len++;
+		printf("message : %s\n", result.Xat_val[result.Xat_len].data);
 
+		result.Xat_len++;
 		while(!feof(f)) {
 
 			result.Xat_val = realloc(result.Xat_val, sizeof(Message) * (result.Xat_len + 1));
 			result.Xat_val[result.Xat_len].data = (char *) malloc (sizeof(char) * 200);
 			fgets(result.Xat_val[result.Xat_len].data, 200, f);
 			result.Xat_val[result.Xat_len].data[strlen(result.Xat_val[result.Xat_len].data) - 1] = '\0';
+			printf("message : %s\n", result.Xat_val[result.Xat_len].data);
 			result.Xat_len++;
 		}
 
 		result.Xat_len--;
 
 		fclose(f);
-	} else {
-		result.Xat_len = 0;
 	}
-
-	return(&result);
+	return &result;
 }

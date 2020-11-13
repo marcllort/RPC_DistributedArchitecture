@@ -6,75 +6,61 @@
 #ifndef _XAT_H_RPCGEN
 #define _XAT_H_RPCGEN
 
-#define RPCGEN_VERSION	199506
-
 #include <rpc/rpc.h>
-#include <string.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <stdio.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 struct Message {
 	char *data;
 	char *user;
 };
-
-typedef struct {
-	CLIENT * clnt;
-	char * username;
-} ThreadInfo;
-
 typedef struct Message Message;
-#ifdef __cplusplus
-extern "C" bool_t xdr_Message(XDR *, Message*);
-#elif __STDC__
-extern  bool_t xdr_Message(XDR *, Message*);
-#else /* Old Style C */
-bool_t xdr_Message();
-#endif /* Old Style C */
-
 
 typedef struct {
 	u_int Xat_len;
 	Message *Xat_val;
 } Xat;
-#ifdef __cplusplus
-extern "C" bool_t xdr_Xat(XDR *, Xat*);
-#elif __STDC__
-extern  bool_t xdr_Xat(XDR *, Xat*);
-#else /* Old Style C */
-bool_t xdr_Xat();
-#endif /* Old Style C */
 
+#define PROGRAM_XAT 0x20000001
+#define VERSION_XAT 1
 
-#define PROGRAM_XAT ((rpc_uint)0x20000001)
-#define VERSION_XAT ((rpc_uint)1)
-
-#ifdef __cplusplus
-#define writeMsg ((rpc_uint)1)
-extern "C" int * writemsg_1(Message *, CLIENT *);
-extern "C" int * writemsg_1_svc(Message *, struct svc_req *);
-#define getChat ((rpc_uint)2)
-extern "C" Xat * getchat_1(int *, CLIENT *);
-extern "C" Xat * getchat_1_svc(int *, struct svc_req *);
-
-#elif __STDC__
-#define writeMsg ((rpc_uint)1)
+#if defined(__STDC__) || defined(__cplusplus)
+#define writeMsg 1
 extern  int * writemsg_1(Message *, CLIENT *);
 extern  int * writemsg_1_svc(Message *, struct svc_req *);
-#define getChat ((rpc_uint)2)
+#define getChat 2
 extern  Xat * getchat_1(int *, CLIENT *);
 extern  Xat * getchat_1_svc(int *, struct svc_req *);
+extern int program_xat_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
-#else /* Old Style C */
-#define writeMsg ((rpc_uint)1)
+#else /* K&R C */
+#define writeMsg 1
 extern  int * writemsg_1();
 extern  int * writemsg_1_svc();
-#define getChat ((rpc_uint)2)
+#define getChat 2
 extern  Xat * getchat_1();
 extern  Xat * getchat_1_svc();
-#endif /* Old Style C */
+extern int program_xat_1_freeresult ();
+#endif /* K&R C */
+
+/* the xdr functions */
+
+#if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t xdr_Message (XDR *, Message*);
+extern  bool_t xdr_Xat (XDR *, Xat*);
+
+#else /* K&R C */
+extern bool_t xdr_Message ();
+extern bool_t xdr_Xat ();
+
+#endif /* K&R C */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_XAT_H_RPCGEN */
