@@ -7,7 +7,7 @@
 #define _XAT_H_RPCGEN
 
 #include <rpc/rpc.h>
-
+#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +24,12 @@ typedef struct {
 	u_int Xat_len;
 	Message *Xat_val;
 } Xat;
+
+typedef struct {
+	CLIENT * clnt;
+	char * username;
+	int getchat_1_arg;
+} ThreadInfo;
 
 #define PROGRAM_XAT 0x20000001
 #define VERSION_XAT 1

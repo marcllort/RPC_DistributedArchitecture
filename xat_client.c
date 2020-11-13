@@ -30,14 +30,31 @@ char * IO_readKeyboard () {
 	return frase;
 }
 
+
+void * threadLector(void * threadInfo) {
+
+	ThreadInfo threadInfoAux = *((ThreadInfo *) threadInfo);
+	Xat * xat;
+	int getchat_1_arg = 0;
+	while (1) {
+		printf("no peta\n");
+		xat = getchat_1((void*)&getchat_1_arg, threadInfoAux.clnt);
+		if (xat == (Xat *) NULL) {
+			clnt_perror (threadInfoAux.clnt, "call failed f2");
+		}else{
+			printf("message : %s\n", xat->Xat_val[xat->Xat_len-1].data);
+		}
+		
+		sleep(1);
+	}
+}
+
 void
 program_xat_1(char *host, char* user)
 {
 	CLIENT *clnt;
 	int  *result_1;
 	Message  writemsg_1_arg;
-	Xat  *result_2;
-	int  getchat_1_arg;
 	char * keyboard;
 
 #ifndef	DEBUG
@@ -49,7 +66,7 @@ program_xat_1(char *host, char* user)
 #endif	/* DEBUG */
 
 
-	writemsg_1_arg.user = user;
+	/*writemsg_1_arg.user = user;
 	writemsg_1_arg.data = host;
 
 
@@ -63,7 +80,14 @@ program_xat_1(char *host, char* user)
 	}else{
 		printf("HHHH");
 		printf("message : %s\n", result_2->Xat_val[result_2->Xat_len-1].data);
-	}
+	}*/
+	ThreadInfo threadInfo;
+	threadInfo.clnt = clnt;
+	threadInfo.username = user;
+	
+	pthread_t llegirThread;
+	pthread_create(&llegirThread, NULL, threadLector, &threadInfo);
+
 	keyboard = IO_readKeyboard();
 	writemsg_1_arg.user = user;
 	while (strcmp(keyboard, "EXIT")) {
@@ -73,8 +97,8 @@ program_xat_1(char *host, char* user)
 		if (result_1 == (void *) NULL) {
 			clnt_perror (clnt, "call failed");
 		}
-		keyboard = IO_readKeyboard();
 		
+		keyboard = IO_readKeyboard();
 	}
 
 #ifndef	DEBUG
