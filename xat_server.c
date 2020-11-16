@@ -60,7 +60,41 @@ getchat_1_svc(int *argp, struct svc_req *rqstp)
 	h.Xat_len = 0;
 	h.Xat_val = NULL;
 	Xat messages = h;
+	
 	printf("peta2\n");
+	FILE * f = fopen("xat.txt", "r");
+	if (f != NULL) {
+		while (!feof(f))
+		{
+			Message m;
+			char *line = (char *) malloc (sizeof(char) * 200);
+			fgets(line, 200, f);
+			char *p;
+			if (strlen(line) > 0)
+			{
+				p = strtok(line, ":");
+				if(p)
+				{
+					printf("NAME: %s\n", p);
+				}
+				m.user = p;
+				p = strtok(NULL, ":");
+
+				if(p){
+					printf("MESSAGE: %s\n", p);
+				}
+				
+				m.data = p;
+				
+			
+			CHAIN_add(&messages, m);
+			}
+			
+		}
+		
+		
+
+	}
 	/*for (index = 0; index < h.Xat_len; index++)
 		CHAIN_add(&messages, h.Xat_val[index]);
 	*/

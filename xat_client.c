@@ -35,16 +35,18 @@ void * threadLector(void * threadInfo) {
 
 	ThreadInfo threadInfoAux = *((ThreadInfo *) threadInfo);
 	Xat * xat;
-	int getchat_1_arg = 0;
+	int getchat_1_arg = 0, messageNumber = 0;
 	while (1) {
-		printf("no peta\n");
 		xat = getchat_1((void*)&getchat_1_arg, threadInfoAux.clnt);
 		if (xat == (Xat *) NULL) {
 			clnt_perror (threadInfoAux.clnt, "call failed f2");
 		}else{
-			printf("message : %s\n", xat->Xat_val[xat->Xat_len-1].data);
+			for (int i = messageNumber; i < xat->Xat_len; i++)
+			{
+				printf("message : %s\n", xat->Xat_val[i].data);
+			}
 		}
-		
+		messageNumber = xat->Xat_len;
 		sleep(1);
 	}
 }
