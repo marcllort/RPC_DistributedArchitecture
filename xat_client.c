@@ -26,7 +26,6 @@ char * IO_readKeyboard () {
 		read(0, &c, 1);
 	}
 	frase[i] = '\0';
-	printf("FRASE");
 	return frase;
 }
 
@@ -43,7 +42,7 @@ void * threadLector(void * threadInfo) {
 		}else{
 			for (int i = messageNumber; i < xat->Xat_len; i++)
 			{
-				printf("message : %s\n", xat->Xat_val[i].data);
+				printf("%s : %s\n", xat->Xat_val[i].user ,xat->Xat_val[i].data);
 			}
 		}
 		messageNumber = xat->Xat_len;

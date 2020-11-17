@@ -16,7 +16,8 @@ writemsg_1_svc(Message *argp, struct svc_req *rqstp)
 	FILE * f = fopen("xat.txt", "a");
 
 	fprintf(f, "%s : %s\n", argp->user, argp->data);
-			printf("MESSAGE RECEIVED --- %s : %s\n", argp->user, argp->data);
+	fputs(" \0", f);
+	printf("MESSAGE RECEIVED --- %s : %s\n", argp->user, argp->data);
 
 	fclose(f);
 
@@ -34,7 +35,8 @@ int CHAIN_add(Xat *h, Message msg) {
 	strcpy(h->Xat_val[h->Xat_len].user, msg.user);
 
 
-	return ++h->Xat_len;
+	h->Xat_len ++;
+	return h->Xat_len;
 }
 
 void CHAIN_toString(Xat h) {
@@ -53,7 +55,6 @@ Xat *
 getchat_1_svc(int *argp, struct svc_req *rqstp)
 {
 	static Xat result;
-	printf("peta1\n");
 	//u_int index;
 	Xat h;
 
@@ -61,7 +62,6 @@ getchat_1_svc(int *argp, struct svc_req *rqstp)
 	h.Xat_val = NULL;
 	Xat messages = h;
 	
-	printf("peta2\n");
 	FILE * f = fopen("xat.txt", "r");
 	if (f != NULL) {
 		while (!feof(f))
@@ -75,19 +75,19 @@ getchat_1_svc(int *argp, struct svc_req *rqstp)
 				p = strtok(line, ":");
 				if(p)
 				{
-					printf("NAME: %s\n", p);
+					//printf("NAME: %s\n", p);
+					m.user = p;
+					p = strtok(NULL, ":");
 				}
-				m.user = p;
-				p = strtok(NULL, ":");
+				
 
 				if(p){
-					printf("MESSAGE: %s\n", p);
+					//printf("MESSAGE: %s\n", p);
+					m.data = p;
 				}
 				
-				m.data = p;
-				
 			
-			CHAIN_add(&messages, m);
+				CHAIN_add(&messages, m);
 			}
 			
 		}
@@ -98,13 +98,13 @@ getchat_1_svc(int *argp, struct svc_req *rqstp)
 	/*for (index = 0; index < h.Xat_len; index++)
 		CHAIN_add(&messages, h.Xat_val[index]);
 	*/
-	Message m;
+	/*Message m;
 	m.data="test";
 	m.user="marc";
-	CHAIN_add(&messages, m);
+	CHAIN_add(&messages, m);*/
 	result = messages;
+	result.Xat_len--;
 	CHAIN_toString(result);
-	printf("peta3\n");
 
 	return &result;
 }
