@@ -5,58 +5,100 @@
  */
 
 #include "xat.h"
+#include <string.h>
+
 
 int *
-writemsg_1(argp, rqstp)
-	Message *argp;
-	struct svc_req *rqstp;
-{
+writemsg_1_svc(Message *argp, struct svc_req *rqstp) {
+    static int result;
 
-	static int  result;
+    FILE *f = fopen("xat.txt", "a");
 
-	FILE * f = fopen("xat.txt", "a");
+    fprintf(f, "%s : %s\n", argp->user, argp->data);
+    fputs(" \0", f);
+    printf("MESSAGE RECEIVED --- %s : %s\n", argp->user, argp->data);
 
-	fprintf(f, "%s : %s\n", argp->user, argp->data);
+    fclose(f);
 
-	fclose(f);
+    return &result;
+}
 
-	return(&result);
+int CHAIN_add(Xat *h, Message msg) {
+
+    h->Xat_val = realloc(h->Xat_val, (h->Xat_len + 1) * sizeof(Message));
+
+    h->Xat_val[h->Xat_len].data = malloc(strlen(msg.data) + 1);
+    h->Xat_val[h->Xat_len].user = malloc(strlen(msg.user) + 1);
+
+    strcpy(h->Xat_val[h->Xat_len].data, msg.data);
+    strcpy(h->Xat_val[h->Xat_len].user, msg.user);
+
+
+    h->Xat_len++;
+    return h->Xat_len;
+}
+
+void CHAIN_toString(Xat h) {
+    char aux[200 + 1];
+
+    sprintf(aux, "CHAIN string: %d\n", h.Xat_len);
+
+    for (u_int i = 0; i < h.Xat_len; i++) {
+        sprintf(aux, "%s: ", h.Xat_val[i].user);
+        sprintf(aux, "%s\n", h.Xat_val[i].data);
+    }
+
 }
 
 Xat *
-getchat_1(argp, rqstp)
-	int *argp;
-	struct svc_req *rqstp;
-{
+getchat_1_svc(int *argp, struct svc_req *rqstp) {
+    static Xat result;
+    //u_int index;
+    Xat h;
 
-	static Xat  result;
+    h.Xat_len = 0;
+    h.Xat_val = NULL;
+    Xat messages = h;
 
-	Message aux;
-	FILE * f = fopen("xat.txt", "r");
-	if (f != NULL) {
+    FILE *f = fopen("xat.txt", "r");
+    if (f != NULL) {
+        while (!feof(f)) {
+            Message m;
+            char *line = (char *) malloc(sizeof(char) * 200);
+            fgets(line, 200, f);
+            char *p;
+            if (strlen(line) > 0) {
+                p = strtok(line, ":");
+                if (p) {
+                    //printf("NAME: %s\n", p);
+                    m.user = p;
+                    p = strtok(NULL, ":");
+                }
 
-		result.Xat_len = 0;
-		result.Xat_val = (Message *) malloc (sizeof(Message));
-		result.Xat_val[result.Xat_len].data = (char *) malloc (sizeof(char) * 200);
-		fgets(result.Xat_val[result.Xat_len].data, 200, f);
-		result.Xat_val[result.Xat_len].data[strlen(result.Xat_val[result.Xat_len].data) - 1] = '\0';
-		result.Xat_len++;
 
-		while(!feof(f)) {
+                if (p) {
+                    //printf("MESSAGE: %s\n", p);
+                    m.data = p;
+                }
 
-			result.Xat_val = realloc(result.Xat_val, sizeof(Message) * (result.Xat_len + 1));
-			result.Xat_val[result.Xat_len].data = (char *) malloc (sizeof(char) * 200);
-			fgets(result.Xat_val[result.Xat_len].data, 200, f);
-			result.Xat_val[result.Xat_len].data[strlen(result.Xat_val[result.Xat_len].data) - 1] = '\0';
-			result.Xat_len++;
-		}
 
-		result.Xat_len--;
+                CHAIN_add(&messages, m);
+            }
 
-		fclose(f);
-	} else {
-		result.Xat_len = 0;
-	}
+        }
 
-	return(&result);
+
+    }
+    /*for (index = 0; index < h.Xat_len; index++)
+        CHAIN_add(&messages, h.Xat_val[index]);
+    */
+    /*Message m;
+    m.data="test";
+    m.user="marc";
+    CHAIN_add(&messages, m);*/
+    result = messages;
+    result.Xat_len--;
+    CHAIN_toString(result);
+
+    return &result;
 }

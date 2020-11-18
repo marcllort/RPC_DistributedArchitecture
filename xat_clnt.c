@@ -3,33 +3,36 @@
  * It was generated using rpcgen.
  */
 
+#include <memory.h> /* for memset */
 #include "xat.h"
 
 /* Default timeout can be changed using clnt_control() */
-static struct timeval TIMEOUT = { 25, 0 };
+static struct timeval TIMEOUT = {25, 0};
 
 int *
-writemsg_1(argp, clnt)
-	Message *argp;
-	CLIENT *clnt;
-{
-	static int clnt_res;
+writemsg_1(Message *argp, CLIENT *clnt) {
+    static int clnt_res;
 
-	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call(clnt, writeMsg, xdr_Message, argp, xdr_int, &clnt_res, TIMEOUT) != RPC_SUCCESS)
-		return (NULL);
-	return (&clnt_res);
+    memset((char *) &clnt_res, 0, sizeof(clnt_res));
+    if (clnt_call(clnt, writeMsg,
+                  (xdrproc_t) xdr_Message, (caddr_t) argp,
+                  (xdrproc_t) xdr_int, (caddr_t) & clnt_res,
+                  TIMEOUT) != RPC_SUCCESS) {
+        return (NULL);
+    }
+    return (&clnt_res);
 }
 
 Xat *
-getchat_1(argp, clnt)
-	int *argp;
-	CLIENT *clnt;
-{
-	static Xat clnt_res;
+getchat_1(int *argp, CLIENT *clnt) {
+    static Xat clnt_res;
 
-	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call(clnt, getChat, xdr_int, argp, xdr_Xat, &clnt_res, TIMEOUT) != RPC_SUCCESS)
-		return (NULL);
-	return (&clnt_res);
+    memset((char *) &clnt_res, 0, sizeof(clnt_res));
+    if (clnt_call(clnt, getChat,
+                  (xdrproc_t) xdr_int, (caddr_t) argp,
+                  (xdrproc_t) xdr_Xat, (caddr_t) & clnt_res,
+                  TIMEOUT) != RPC_SUCCESS) {
+        return (NULL);
+    }
+    return (&clnt_res);
 }
