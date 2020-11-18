@@ -15,7 +15,7 @@ writemsg_1_svc(Message *argp, struct svc_req *rqstp) {
     FILE *f = fopen("xat.txt", "a");
 
     fprintf(f, "%s : %s\n", argp->user, argp->data);
-    fputs(" \0", f);
+    fputs("\0", f);
     printf("MESSAGE RECEIVED --- %s : %s\n", argp->user, argp->data);
 
     fclose(f);
@@ -58,12 +58,13 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
     h.Xat_len = 0;
     h.Xat_val = NULL;
     Xat messages = h;
+    int nMessages = 0;
 
     FILE *f = fopen("xat.txt", "r");
     if (f != NULL) {
         printf("Position: %d\n", *argp);
         fseek(f, *argp, SEEK_SET);
-        while (!feof(f)) {
+        while (!feof(f) && nMessages < 200) {
             Message m;
             char *line = (char *) malloc(sizeof(char) * 200);
             fgets(line, 200, f);
@@ -83,7 +84,9 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
                 }
 
                 CHAIN_add(&messages, m);
+
             }
+            nMessages++;
             free(line);
 
         }
