@@ -47,7 +47,7 @@ void *threadLector(void *threadInfo) {
                 } else {
                     printf("my message\n");
                 }
-                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 3;
+                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 3; // si passo un 0 sempre, funciona
             }
         }
         printf("Position: %d\n", getchat_1_arg);
