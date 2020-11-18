@@ -61,9 +61,10 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
     FILE *f = fopen("xat.txt", "r");
     if (f != NULL) {
-        printf("int: %d", *argp);
+        printf("Position: %d\n", *argp);
         fseek(f, *argp, SEEK_SET);
         while (!feof(f)) {
+            printf("while")
             Message m;
             char *line = (char *) malloc(sizeof(char) * 200);
             fgets(line, 200, f);
@@ -71,19 +72,22 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
             if (strlen(line) > 0) {
                 p = strtok(line, ":");
                 if (p) {
+                    //printf("NAME: %s\n", p);
                     m.user = p;
                     p = strtok(NULL, ":");
+                }
+
+                if (p) {
                     m.data = p;
                 }
+
                 CHAIN_add(&messages, m);
             }
 
         }
-
+        fclose(f);
 
     }
-
-    fclose(f);
 
     result = messages;
     result.Xat_len--;
