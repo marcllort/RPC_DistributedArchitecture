@@ -26,6 +26,7 @@ char *IO_readKeyboard() {
         read(0, &c, 1);
     }
     frase[i] = '\0';
+
     return frase;
 }
 
@@ -40,10 +41,12 @@ void *threadLector(void *threadInfo) {
         if (xat == (Xat *) NULL) {
             clnt_perror(threadInfoAux.clnt, "call failed f2");
         } else {
-            for (int i = messageNumber; i < xat->Xat_len; i++) {
-                printf("%s : %s\n", xat->Xat_val[i].user, xat->Xat_val[i].data);
+            for (int i = 0; i < xat->Xat_len; i++) {
+                printf("%s: %s\n", xat->Xat_val[i].user, xat->Xat_val[i].data);
+                getchat_1_arg = strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 3;
             }
         }
+        printf("int: %d", getchat_1_arg);
         messageNumber = xat->Xat_len;
         sleep(1);
     }
@@ -64,22 +67,6 @@ program_xat_1(char *host, char *user) {
     }
 #endif    /* DEBUG */
 
-
-    /*writemsg_1_arg.user = user;
-    writemsg_1_arg.data = host;
-
-
-    result_1 = writemsg_1(&writemsg_1_arg, clnt);
-    if (result_1 == (int *) NULL) {
-        clnt_perror (clnt, "call failed f1");
-    }
-    result_2 = getchat_1(&getchat_1_arg, clnt);
-    if (result_2 == (Xat *) NULL) {
-        clnt_perror (clnt, "call failed f2");
-    }else{
-        printf("HHHH");
-        printf("message : %s\n", result_2->Xat_val[result_2->Xat_len-1].data);
-    }*/
     ThreadInfo threadInfo;
     threadInfo.clnt = clnt;
     threadInfo.username = user;

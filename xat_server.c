@@ -53,7 +53,6 @@ void CHAIN_toString(Xat h) {
 Xat *
 getchat_1_svc(int *argp, struct svc_req *rqstp) {
     static Xat result;
-    //u_int index;
     Xat h;
 
     h.Xat_len = 0;
@@ -62,6 +61,8 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
     FILE *f = fopen("xat.txt", "r");
     if (f != NULL) {
+        printf("int: %d", *argp);
+        fseek(f, *argp, SEEK_SET);
         while (!feof(f)) {
             Message m;
             char *line = (char *) malloc(sizeof(char) * 200);
@@ -70,18 +71,10 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
             if (strlen(line) > 0) {
                 p = strtok(line, ":");
                 if (p) {
-                    //printf("NAME: %s\n", p);
                     m.user = p;
                     p = strtok(NULL, ":");
-                }
-
-
-                if (p) {
-                    //printf("MESSAGE: %s\n", p);
                     m.data = p;
                 }
-
-
                 CHAIN_add(&messages, m);
             }
 
@@ -89,13 +82,9 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
 
     }
-    /*for (index = 0; index < h.Xat_len; index++)
-        CHAIN_add(&messages, h.Xat_val[index]);
-    */
-    /*Message m;
-    m.data="test";
-    m.user="marc";
-    CHAIN_add(&messages, m);*/
+
+    fclose(f);
+
     result = messages;
     result.Xat_len--;
     CHAIN_toString(result);
