@@ -35,7 +35,7 @@ void *threadLector(void *threadInfo) {
 
     ThreadInfo threadInfoAux = *((ThreadInfo *) threadInfo);
     Xat *xat;
-    int getchat_1_arg = 0, messageNumber = 0;
+    int getchat_1_arg = 0;
     while (1) {
         xat = getchat_1((void *) &getchat_1_arg, threadInfoAux.clnt);
         if (xat == (Xat *) NULL) {
