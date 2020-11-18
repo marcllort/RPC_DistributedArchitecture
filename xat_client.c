@@ -42,15 +42,15 @@ void *threadLector(void *threadInfo) {
             clnt_perror(threadInfoAux.clnt, "call failed f2");
         } else {
             for (int i = 0; i < xat->Xat_len; i++) {
-                if (!strcmp(threadInfoAux.username, xat->Xat_val[i].user)) {
+                //if (!strcmp(threadInfoAux.username, xat->Xat_val[i].user)) {
                     printf("%s: %s\n", xat->Xat_val[i].user, xat->Xat_val[i].data);
-                } else {
-                    printf("my message\n");
-                }
-                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 3; // si passo un 0 sempre, funciona
+                //} else {
+                  //  printf("my message\n");
+                //}
+                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data);// + 3; // si passo un 0 sempre, funciona
             }
         }
-        printf("Position: %d\n", getchat_1_arg);
+        //printf("Position: %d\n", getchat_1_arg);
         sleep(1);
     }
 }

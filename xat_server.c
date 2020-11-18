@@ -64,10 +64,11 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
         printf("Position: %d\n", *argp);
         fseek(f, *argp, SEEK_SET);
         while (!feof(f)) {
-            printf("while");
             Message m;
             char *line = (char *) malloc(sizeof(char) * 200);
             fgets(line, 200, f);
+
+            //printf("LINE: %s\n",line);
             char *p;
             if (strlen(line) > 0) {
                 p = strtok(line, ":");
@@ -83,6 +84,7 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
                 CHAIN_add(&messages, m);
             }
+            free(line);
 
         }
         fclose(f);
