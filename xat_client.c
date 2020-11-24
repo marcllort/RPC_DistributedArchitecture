@@ -16,6 +16,7 @@ char *IO_readKeyboard() {
 
     frase = (char *) malloc(sizeof(char));
     read(0, &c, 1);
+    //saltem espais al inici del missatge
     while (c == ' ') {
         read(0, &c, 1);
     }
@@ -26,7 +27,7 @@ char *IO_readKeyboard() {
         read(0, &c, 1);
     }
     frase[i] = '\0';
-
+    printf("\r");
     return frase;
 }
 
@@ -44,13 +45,13 @@ void *threadLector(void *threadInfo) {
             for (int i = 0; i < xat->Xat_len; i++) {
                 //if (!strcmp(threadInfoAux.username, xat->Xat_val[i].user)) {
                     printf("%s: %s\n", xat->Xat_val[i].user, xat->Xat_val[i].data);
+
                 //} else {
                   //  printf("my message\n");
                 //}
-                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data);// + 3; // si passo un 0 sempre, funciona
+                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 1;// + 1 ja que cada strlen ens dona 1 mes i hauria de ser un +3
             }
         }
-        //printf("Position: %d\n", getchat_1_arg);
         sleep(1);
     }
 }

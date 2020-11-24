@@ -62,7 +62,6 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
     FILE *f = fopen("xat.txt", "r");
     if (f != NULL) {
-        printf("Position: %d\n", *argp);
         fseek(f, *argp, SEEK_SET);
         while (!feof(f) && nMessages < 200) {
             Message m;
@@ -71,7 +70,7 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
             //printf("LINE: %s\n",line);
             char *p;
-            if (strlen(line) > 0) {
+            if (strlen(line) > 3) {
                 p = strtok(line, ":");
                 if (p) {
                     //printf("NAME: %s\n", p);
@@ -84,9 +83,8 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
                 }
 
                 CHAIN_add(&messages, m);
-
+				nMessages++;
             }
-            nMessages++;
             free(line);
 
         }
