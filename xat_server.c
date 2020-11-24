@@ -23,10 +23,9 @@ writemsg_1_svc(Message *argp, struct svc_req *rqstp) {
     return &result;
 }
 
-int CHAIN_add(Xat *h, Message msg) {
+int addMessage(Xat *h, Message msg) {
 
     h->Xat_val = realloc(h->Xat_val, (h->Xat_len + 1) * sizeof(Message));
-
     h->Xat_val[h->Xat_len].data = malloc(strlen(msg.data) + 1);
     h->Xat_val[h->Xat_len].user = malloc(strlen(msg.user) + 1);
 
@@ -38,21 +37,10 @@ int CHAIN_add(Xat *h, Message msg) {
     return h->Xat_len;
 }
 
-void CHAIN_toString(Xat h) {
-    char aux[200 + 1];
-
-    sprintf(aux, "CHAIN string: %d\n", h.Xat_len);
-
-    for (u_int i = 0; i < h.Xat_len; i++) {
-        sprintf(aux, "%s: ", h.Xat_val[i].user);
-        sprintf(aux, "%s\n", h.Xat_val[i].data);
-    }
-
-}
-
 Xat *
 getchat_1_svc(int *argp, struct svc_req *rqstp) {
     static Xat result;
+
     Xat h;
 
     h.Xat_len = 0;
@@ -82,7 +70,7 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
                     m.data = p;
                 }
 
-                CHAIN_add(&messages, m);
+                addMessage(&messages, m);
 				nMessages++;
             }
             free(line);
@@ -94,7 +82,6 @@ getchat_1_svc(int *argp, struct svc_req *rqstp) {
 
     result = messages;
     result.Xat_len--;
-    CHAIN_toString(result);
 
     return &result;
 }

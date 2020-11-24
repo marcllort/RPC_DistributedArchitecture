@@ -8,31 +8,31 @@
 #include <string.h>
 #include <unistd.h>
 
-char *IO_readKeyboard() {
+char *readKeyboard() {
 
-    char *frase;
+    char *input;
     char c;
     int i = 0;
 
-    frase = (char *) malloc(sizeof(char));
+    input = (char *) malloc(sizeof(char));
     read(0, &c, 1);
     //saltem espais al inici del missatge
     while (c == ' ') {
         read(0, &c, 1);
     }
     while (c != '\n') {
-        frase[i] = c;
+        input[i] = c;
         i++;
-        frase = (char *) realloc(frase, sizeof(char) * (i + 1));
+        input = (char *) realloc(input, sizeof(char) * (i + 1));
         read(0, &c, 1);
     }
-    frase[i] = '\0';
+    input[i] = '\0';
     printf("\r");
-    return frase;
+    return input;
 }
 
 
-void *threadLector(void *threadInfo) {
+void *lectorThread(void *threadInfo) {
 
     ThreadInfo threadInfoAux = *((ThreadInfo *) threadInfo);
     Xat *xat;
@@ -52,6 +52,7 @@ void *threadLector(void *threadInfo) {
                 getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 1;// + 1 ja que cada strlen ens dona 1 mes i hauria de ser un +3
             }
         }
+
         sleep(1);
     }
 }
@@ -75,12 +76,12 @@ program_xat_1(char *host, char *user) {
     threadInfo.clnt = clnt;
     threadInfo.username = user;
 
-    pthread_t llegirThread;
-    pthread_create(&llegirThread, NULL, threadLector, &threadInfo);
+    pthread_t readThread;
+    pthread_create(&readThread, NULL, lectorThread, &threadInfo);
 
-    keyboard = IO_readKeyboard();
+    keyboard = readKeyboard();
     writemsg_1_arg.user = user;
-    while (strcmp(keyboard, "EXIT")) {
+    while (strcmp(keyboard, "BYE")) {
 
         writemsg_1_arg.data = keyboard;
         result_1 = writemsg_1(&writemsg_1_arg, clnt);
@@ -88,7 +89,7 @@ program_xat_1(char *host, char *user) {
             clnt_perror(clnt, "call failed");
         }
 
-        keyboard = IO_readKeyboard();
+        keyboard = readKeyboard();
     }
 
 #ifndef    DEBUG
