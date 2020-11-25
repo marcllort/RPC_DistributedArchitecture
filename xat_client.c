@@ -8,13 +8,11 @@
 #include <string.h>
 #include <unistd.h>
 
-int msleep(long msec)
-{
+int msleep(long msec) {
     struct timespec ts;
     int res;
 
-    if (msec < 0)
-    {
+    if (msec < 0) {
         return -1;
     }
 
@@ -28,11 +26,12 @@ int msleep(long msec)
     return res;
 }
 
-char *readKeyboard() {
+char *readKeyboard(char* user) {
 
     char *input;
     char c;
     int i = 0;
+
 
     input = (char *) malloc(sizeof(char));
     read(0, &c, 1);
@@ -40,14 +39,17 @@ char *readKeyboard() {
     while (c == ' ') {
         read(0, &c, 1);
     }
+
     while (c != '\n') {
         input[i] = c;
         i++;
         input = (char *) realloc(input, sizeof(char) * (i + 1));
         read(0, &c, 1);
     }
+
     input[i] = '\0';
     printf("\r");
+
     return input;
 }
 
@@ -57,19 +59,19 @@ void *lectorThread(void *threadInfo) {
     ThreadInfo threadInfoAux = *((ThreadInfo *) threadInfo);
     Xat *xat;
     int getchat_1_arg = 0;
+
     while (1) {
         xat = getchat_1((void *) &getchat_1_arg, threadInfoAux.clnt);
         if (xat == (Xat *) NULL) {
             clnt_perror(threadInfoAux.clnt, "call failed f2");
         } else {
             for (int i = 0; i < xat->Xat_len; i++) {
-                //if (!strcmp(threadInfoAux.username, xat->Xat_val[i].user)) {
-                    printf("%s: %s\n", xat->Xat_val[i].user, xat->Xat_val[i].data);
 
-                //} else {
-                  //  printf("my message\n");
-                //}
-                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 1;// + 1 ja que cada strlen ens dona 1 mes i hauria de ser un +3
+                if (strcmp(threadInfoAux.username, xat->Xat_val[i].user) != -32) {
+                    printf("%s: %s\n", xat->Xat_val[i].user, xat->Xat_val[i].data);
+                }
+                getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) +
+                                1;// + 1 ja que cada strlen ens dona 1 mes i hauria de ser un +3
             }
         }
         msleep(50);
@@ -98,8 +100,9 @@ program_xat_1(char *host, char *user) {
     pthread_t readThread;
     pthread_create(&readThread, NULL, lectorThread, &threadInfo);
 
-    keyboard = readKeyboard();
+    keyboard = readKeyboard(user);
     writemsg_1_arg.user = user;
+
     while (strcmp(keyboard, "BYE")) {
 
         writemsg_1_arg.data = keyboard;
@@ -108,7 +111,7 @@ program_xat_1(char *host, char *user) {
             clnt_perror(clnt, "call failed");
         }
 
-        keyboard = readKeyboard();
+        keyboard = readKeyboard(user);
     }
 
 #ifndef    DEBUG
@@ -126,8 +129,11 @@ main(int argc, char *argv[]) {
         printf("usage: %s server_host client_username\n", argv[0]);
         exit(1);
     }
+
     host = argv[1];
     user = argv[2];
+
     program_xat_1(host, user);
+
     exit(0);
 }

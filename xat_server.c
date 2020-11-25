@@ -7,6 +7,7 @@
 #include "xat.h"
 #include <string.h>
 
+#define BATCH_MESSAGES 200
 
 int *
 writemsg_1_svc(Message *argp, struct svc_req *rqstp) {
@@ -16,71 +17,69 @@ writemsg_1_svc(Message *argp, struct svc_req *rqstp) {
 
     fprintf(f, "%s : %s\n", argp->user, argp->data);
     fputs("\0", f);
-    printf("MESSAGE RECEIVED --- %s : %s\n", argp->user, argp->data);
-
     fclose(f);
+
+    printf("[SERVER] --- %s : %s\n", argp->user, argp->data);
 
     return &result;
 }
 
-int addMessage(Xat *h, Message msg) {
+int addMessage(Xat *xat, Message msg) {
+    xat->Xat_val = realloc(xat->Xat_val, (xat->Xat_len + 1) * sizeof(Message));
+    xat->Xat_val[xat->Xat_len].data = malloc(strlen(msg.data) + 1);
+    xat->Xat_val[xat->Xat_len].user = malloc(strlen(msg.user) + 1);
 
-    h->Xat_val = realloc(h->Xat_val, (h->Xat_len + 1) * sizeof(Message));
-    h->Xat_val[h->Xat_len].data = malloc(strlen(msg.data) + 1);
-    h->Xat_val[h->Xat_len].user = malloc(strlen(msg.user) + 1);
+    strcpy(xat->Xat_val[xat->Xat_len].data, msg.data);
+    strcpy(xat->Xat_val[xat->Xat_len].user, msg.user);
 
-    strcpy(h->Xat_val[h->Xat_len].data, msg.data);
-    strcpy(h->Xat_val[h->Xat_len].user, msg.user);
+    xat->Xat_len++;
 
-
-    h->Xat_len++;
-    return h->Xat_len;
+    return xat->Xat_len;
 }
 
 Xat *
 getchat_1_svc(int *argp, struct svc_req *rqstp) {
     static Xat result;
 
-    Xat h;
+    Xat xat;
+    xat.Xat_len = 0;
+    xat.Xat_val = NULL;
 
-    h.Xat_len = 0;
-    h.Xat_val = NULL;
-    Xat messages = h;
     int nMessages = 0;
 
     FILE *f = fopen("xat.txt", "r");
+
     if (f != NULL) {
         fseek(f, *argp, SEEK_SET);
-        while (!feof(f) && nMessages < 200) {
+
+        while (!feof(f) && nMessages < BATCH_MESSAGES) {
             Message m;
+            char *p;
             char *line = (char *) malloc(sizeof(char) * 200);
+
             fgets(line, 200, f);
 
-            //printf("LINE: %s\n",line);
-            char *p;
             if (strlen(line) > 3) {
                 p = strtok(line, ":");
+
                 if (p) {
-                    //printf("NAME: %s\n", p);
                     m.user = p;
                     p = strtok(NULL, ":");
                 }
-
                 if (p) {
                     m.data = p;
                 }
 
-                addMessage(&messages, m);
-				nMessages++;
+                addMessage(&xat, m);
+                nMessages++;
             }
             free(line);
 
         }
         fclose(f);
-
     }
 
-    result = messages;
+    result = xat;
     result.Xat_len--;
 
     return &result;
