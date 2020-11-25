@@ -8,6 +8,26 @@
 #include <string.h>
 #include <unistd.h>
 
+int msleep(long msec)
+{
+    struct timespec ts;
+    int res;
+
+    if (msec < 0)
+    {
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res);
+
+    return res;
+}
+
 char *readKeyboard() {
 
     char *input;
@@ -52,8 +72,7 @@ void *lectorThread(void *threadInfo) {
                 getchat_1_arg = getchat_1_arg + strlen(xat->Xat_val[i].user) + strlen(xat->Xat_val[i].data) + 1;// + 1 ja que cada strlen ens dona 1 mes i hauria de ser un +3
             }
         }
-
-        sleep(1);
+        msleep(50);
     }
 }
 
